@@ -9,9 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     // 数据库信息
     private static final String DATABASE_NAME = "HealthyDoggyDB";
+    //版本号：每次修改版本类型都要升这个数字
     private static final int DATABASE_VERSION = 3;
 
-    // 用户表
+    // 用户表（COL：column 列，表示一个字段）
     public static final String TABLE_USERS = "users";
     public static final String COL_USER_ID = "_id";
     public static final String COL_USER_NAME = "username";
@@ -20,11 +21,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_USER_PHONE = "phone";
 
     // 帖子表
-    public static final String TABLE_POSTS = "posts";
+    public static final String TABLE_POSTS = "posts";    //帖子
     public static final String COL_POST_ID = "_id";
     public static final String COL_POST_TITLE = "title";
-    public static final String COL_POST_CONTENT = "content";
-    public static final String COL_POST_AUTHOR = "author";
+    public static final String COL_POST_CONTENT = "content";   //内容
+    public static final String COL_POST_AUTHOR = "author";  //作者
     public static final String COL_POST_TIME = "time";
 
     // 消息表
@@ -36,27 +37,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_MSG_POST_ID = "post_id";
 
     // 商品表
-    public static final String TABLE_PRODUCTS = "products";
+    public static final String TABLE_PRODUCTS = "products";  //产品
     public static final String COL_PRODUCT_ID = "_id";
     public static final String COL_PRODUCT_NAME = "name";
     public static final String COL_PRODUCT_PRICE = "price";
-    public static final String COL_PRODUCT_DESC = "description";
+    public static final String COL_PRODUCT_DESC = "description";  //描述
 
     // 健康记录表
-    public static final String TABLE_HEALTH = "health_records";
+    public static final String TABLE_HEALTH = "health_records";   //健康记录
     public static final String COL_HEALTH_ID = "_id";
     public static final String COL_HEALTH_DATE = "date";
     public static final String COL_HEALTH_WEIGHT = "weight";
-    public static final String COL_HEALTH_TEMP = "temperature";
+    public static final String COL_HEALTH_TEMP = "temperature";   //体温
 
     // 创建表语句
+
+    //用户表
+    //常见字段：
+//    NULL	空值	字段为空
+//    INTEGER	有符号整数（-2^63 到 2^63-1）	ID、年龄、数量
+//    REAL	浮点数（8 字节，类似 double）	价格、分数、坐标
+//    TEXT	文本字符串（UTF-8/16）	名字、描述、邮箱、手机号
+//    BLOB	二进制大数据（如图片、文件）	头像、附件
+
+//    约束	说明	示例
+//1. PRIMARY KEY	主键：唯一标识一条记录，不能为空，自动创建索引	id INTEGER PRIMARY KEY
+//2. AUTOINCREMENT	自动递增：配合 PRIMARY KEY 使用，ID 自动 +1	INTEGER PRIMARY KEY AUTOINCREMENT
+//3. NOT NULL	非空：该字段不能为 NULL	username TEXT NOT NULL
+//4. UNIQUE	唯一：该字段值在整个表中必须唯一	username TEXT UNIQUE
+//5. DEFAULT	默认值：如果未提供值，使用默认值	status TEXT DEFAULT 'active'
+//6. CHECK	检查：自定义条件验证数据	age INTEGER CHECK(age >= 0)
+//7. FOREIGN KEY	外键：关联另一张表的主键（需开启外键支持）	user_id INTEGER REFERENCES users(id)
+//8. COLLATE	排序规则：定义文本比较方式	name TEXT COLLATE NOCASE（忽略大小写）
+
+
+    //用户表
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS + " (" +
             COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_USER_NAME + " TEXT UNIQUE NOT NULL, " +
-            COL_USER_PASSWORD + " TEXT NOT NULL, " +
+            COL_USER_PASSWORD + " TEXT NOT NULL, " +    //not null:必须填，不可缺
             COL_USER_EMAIL + " TEXT, " +
             COL_USER_PHONE + " TEXT)";
 
+
+    //帖子表
     private static final String CREATE_TABLE_POSTS = "CREATE TABLE " + TABLE_POSTS + " (" +
             COL_POST_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_POST_TITLE + " TEXT NOT NULL, " +
@@ -64,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COL_POST_AUTHOR + " TEXT NOT NULL, " +
             COL_POST_TIME + " TEXT NOT NULL)";
 
+    //消息表
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + " (" +
             COL_MSG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_MSG_USER + " TEXT NOT NULL, " +
@@ -71,17 +96,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COL_MSG_TIME + " TEXT NOT NULL, " +
             COL_MSG_POST_ID + " INTEGER NOT NULL)";
 
+    //产品表
     private static final String CREATE_TABLE_PRODUCTS = "CREATE TABLE " + TABLE_PRODUCTS + " (" +
-            COL_PRODUCT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COL_PRODUCT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +   //integer整数
             COL_PRODUCT_NAME + " TEXT NOT NULL, " +
-            COL_PRODUCT_PRICE + " REAL NOT NULL, " +
+            COL_PRODUCT_PRICE + " REAL NOT NULL, " +  //real小数
             COL_PRODUCT_DESC + " TEXT NOT NULL)";
 
+    //健康记录表
     private static final String CREATE_TABLE_HEALTH = "CREATE TABLE " + TABLE_HEALTH + " (" +
             COL_HEALTH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_HEALTH_DATE + " TEXT NOT NULL, " +
             COL_HEALTH_WEIGHT + " REAL NOT NULL, " +
             COL_HEALTH_TEMP + " REAL NOT NULL)";
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
