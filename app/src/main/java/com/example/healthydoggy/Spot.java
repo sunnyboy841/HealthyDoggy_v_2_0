@@ -1,8 +1,10 @@
-package com.example.healthydoggy; // 包名
+package com.example.healthydoggy;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import java.util.List;
 
-public class Spot {
+public class Spot implements Parcelable {
     private int id;
     private String address;
     private int bed;
@@ -16,6 +18,39 @@ public class Spot {
     private String title;
     private List<String> pic;
 
+    // 空构造方法（Gson解析需要）
+    public Spot() {}
+
+    // 从Parcel中读取数据的构造方法
+    protected Spot(Parcel in) {
+        id = in.readInt();
+        address = in.readString();
+        bed = in.readInt();
+        dateTour = in.readString();
+        description = in.readString();
+        distance = in.readString();
+        duration = in.readString();
+        price = in.readInt();
+        score = in.readDouble();
+        tourCount = in.readString();
+        title = in.readString();
+        pic = in.createStringArrayList(); // 读取字符串列表
+    }
+
+    // Parcelable Creator（必须实现）
+    public static final Creator<Spot> CREATOR = new Creator<Spot>() {
+        @Override
+        public Spot createFromParcel(Parcel in) {
+            return new Spot(in);
+        }
+
+        @Override
+        public Spot[] newArray(int size) {
+            return new Spot[size];
+        }
+    };
+
+    // 以下是原有的getter和setter方法（保持不变）
     public int getId() {
         return id;
     }
@@ -110,5 +145,28 @@ public class Spot {
 
     public void setPic(List<String> pic) {
         this.pic = pic;
+    }
+
+    // Parcelable接口必须实现的方法（返回0即可）
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // 将数据写入Parcel（与构造方法中的读取顺序对应）
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(address);
+        dest.writeInt(bed);
+        dest.writeString(dateTour);
+        dest.writeString(description);
+        dest.writeString(distance);
+        dest.writeString(duration);
+        dest.writeInt(price);
+        dest.writeDouble(score);
+        dest.writeString(tourCount);
+        dest.writeString(title);
+        dest.writeStringList(pic); // 写入字符串列表
     }
 }

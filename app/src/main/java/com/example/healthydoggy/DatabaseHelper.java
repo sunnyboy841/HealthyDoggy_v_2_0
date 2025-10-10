@@ -111,12 +111,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COL_HEALTH_TEMP + " REAL NOT NULL)";
 
 
+
+    //super(...)：调用父类 SQLiteOpenHelper 的构造函数，传入四个参数
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        //super：传给SQLiteOpenHelper（父类）
+        //Context context：构造函数接收一个 Context 参数。Context 提供了访问系统资源和数据库文件路径所需的信息（如应用的包名、文件目录等）。常见的传入参数是 Activity 或 Application 对象。
+        //DATABASE_NAME：数据库文件的名称（例如 "myapp.db"）。如果为 null，则数据库会以内存形式存在（不推荐常规使用）。
+        //null：表示不使用自定义的 CursorFactory。大多数情况下传 null 即可。
+        //DATABASE_VERSION：数据库版本号（整数），用于控制数据库升级和降级。初始值通常设为 1，后续修改表结构时需递增。
     }
 
+
+
+
+    //特别说明：Context的用法
+//    启动 Activity	context.startActivity(intent)
+//🔹 启动 Service	context.startService(service)
+//🔹 发送广播	context.sendBroadcast(intent)
+//🔹 访问资源	context.getString(R.string.app_name)
+//🔹 获取系统服务	LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+//🔹 创建数据库/SharedPreferences	new DatabaseHelper(context)
+//🔹 获取文件存储路径	context.getFilesDir()
+
+
+
+//首次用app时候，创建数据库文件
     @Override
     public void onCreate(SQLiteDatabase db) {
+//        使用 db.execSQL(建表方法函数名) 执行 SQL 语句来创建表。
+//        每条 execSQL() 调用创建一张表，例如：
         db.execSQL(CREATE_TABLE_USERS);
         db.execSQL(CREATE_TABLE_POSTS);
         db.execSQL(CREATE_TABLE_MESSAGES);
@@ -124,9 +148,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_HEALTH);
     }
 
+
+
+    //数据库版本升级，重新创建所有表
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        //"DROP TABLE IF EXISTS "如果存在，删表重建
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_POSTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
@@ -134,32 +162,68 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+
     // 新增：添加全局交流消息（用-1标识为非帖子评论的全局消息）
     public long addGlobalMessage(String username, String content, String time) {
         SQLiteDatabase db = getWritableDatabase();
+        //  打开一个可以写入数据的数据库连接。如果数据库不存在，会自动创建；如果需要升级，也会触发 onUpgrade()。
         ContentValues values = new ContentValues();
+        //ContentValues 是 Android 提供的键值对容器，专门用于数据库插入或更新（但只支持基本数据类型（String、Integer、Long、Byte[] 等。）
+
+        //存储四个到相应字段上
         values.put(COL_MSG_USER, username);
         values.put(COL_MSG_CONTENT, content);
         values.put(COL_MSG_TIME, time);
-        values.put(COL_MSG_POST_ID, -1); // 用-1标识全局消息
+        values.put(COL_MSG_POST_ID, -1); // 用-1标识全局消息（特殊值）
+
         long id = db.insert(TABLE_MESSAGES, null, values);
+        //TABLE_MESSAGES	要插入的表名，如 "messages"
+        // null	当 values 为空时，是否插入一个空行（设为 null 表示不允许）
+        //  values	要插入的数据
         db.close();
         return id;
     }
 
+
+
+
     // 新增：获取所有全局交流消息
+    //方法原型：
+//    Cursor query(
+//            String table,
+//            String[] columns,
+//            String selection,
+//            String[] selectionArgs,
+//            String groupBy,
+//            String having,
+//            String orderBy
+//    )
+
     public Cursor getAllGlobalMessages() {
-        SQLiteDatabase db = getReadableDatabase();
-        return db.query(TABLE_MESSAGES, null,
-                COL_MSG_POST_ID + "=?",
-                new String[]{"-1"}, // 查询标识为全局消息的记录
-                null, null, COL_MSG_TIME + " ASC");
+        SQLiteDatabase db = getReadableDatabase();   //获取全局交流信息
+
+        //返回cursor对象
+        return db.query(
+                TABLE_MESSAGES,           // 表名
+                null,                     // 要查询的列（null 表示所有列）
+                COL_MSG_POST_ID + "=?",   // WHERE 查询条件
+                new String[]{"-1"},       // 条件的参数值（替换 ?）
+                null,                     // GROUP BY（分组）
+                null,                     // HAVING （分组后筛选）
+                COL_MSG_TIME + " ASC"     // 排序方式
+        );
     }
+
+
+
 
     // 帖子相关方法
     public long addPost(String title, String content, String author, String time) {
         SQLiteDatabase db = getWritableDatabase();
+        //来自public android.database.sqlite.SQLiteDatabase getWritableDatabase()
+        //获取可写入的数据库连接（无则创建）
         ContentValues values = new ContentValues();
+        //创建ContentValues的对象，这是安卓特有结构
         values.put(COL_POST_TITLE, title);
         values.put(COL_POST_CONTENT, content);
         values.put(COL_POST_AUTHOR, author);
