@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
     private static Retrofit retrofit;
     // 替换为实际的API基础地址（必须正确配置）
-    private static final String BASE_URL = "http://8.138.243.249:8080/";
+    private static final String BASE_URL = "http://8.138.243.249:8081/";
 
     // 获取景点服务实例
     public static SpotService getSpotService() {

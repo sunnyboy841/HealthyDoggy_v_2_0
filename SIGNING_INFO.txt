@@ -1,0 +1,40 @@
+======================================
+HealthyDoggy 应用签名配置说明
+======================================
+
+【重要提示】
+1. 请妥善保管 keystore.properties 和 healthydoggy.keystore 文件
+2. 这两个文件包含敏感信息，不应提交到 Git 等版本控制系统
+3. 如果丢失密钥库文件，将无法更新已发布的应用
+
+【签名信息】
+- 密钥库文件：healthydoggy.keystore
+- 密钥库密码：HealthyDoggy2026
+- 密钥别名：healthydoggy
+- 密钥密码：HealthyDoggy2026
+- 有效期：10000 天（约 27 年）
+- 算法：RSA 2048 位
+
+【证书信息】
+- CN=HealthyDoggy（通用名称）
+- OU=Development（组织单位）
+- O=Example（组织）
+- L=Beijing（城市）
+- ST=Beijing（省份）
+- C=CN（国家）
+
+【使用方法】
+1. 构建 Release 版本 APK 时会自动使用此签名
+2. 在 Android Studio 中选择 Build -> Generate Signed Bundle / APK
+3. 或使用命令行：./gradlew assembleRelease
+
+【安全建议】
+1. 定期备份密钥库文件和配置文件
+2. 不要将密码明文存储在代码中
+3. 团队协作时，通过安全渠道分享密钥信息
+4. 建议使用更复杂的密码
+
+【注意事项】
+- 当前配置为开发环境签名，生产环境建议使用更安全的签名方案
+- keystore.properties 已添加到 .gitignore，不会被提交
+- healthydoggy.keystore 已添加到 .gitignore，不会被提交
